@@ -1,5 +1,6 @@
 //! Color operations related to the [CSS Color specification ](https://drafts.csswg.org/css-color)
 
+mod alpha;
 mod hsl;
 mod hwb;
 mod lab;
@@ -9,6 +10,7 @@ mod oklch;
 mod rgb;
 mod xyz;
 
+pub use alpha::WithAlpha;
 pub use hsl::Hsl;
 pub use hwb::Hwb;
 pub use lab::Lab;
