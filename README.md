@@ -5,6 +5,13 @@ This crate represents color functionality related to the [CSS color specificatio
 ## Features
 
 - [ ] Structures to represent colors in various formats
+  - RGB
+  - HSL
+  - HWB
+  - LAB
+  - LCH
+  - OKLAB
+  - OKLCH
 - [ ] RGB supports different color spaces:
   - srgb
   - srgb_linear
