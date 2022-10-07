@@ -1,3 +1,4 @@
+use crate::convert::FromColor;
 use std::ops::{Deref, DerefMut};
 
 pub struct WithAlpha<C> {
@@ -35,10 +36,21 @@ impl<T> WithAlphaExt<T> for T {
     }
 }
 
+/// Allows converting from one color format/space with alpha to another color format/space with
+/// alpha.
+impl<F, T: FromColor<F>> FromColor<WithAlpha<F>> for WithAlpha<T> {
+    fn from_color(from: WithAlpha<F>) -> Self {
+        Self {
+            components: T::from_color(from.components),
+            alpha: from.alpha,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::Rgb;
+    use crate::{convert::IntoColor, Rgb, Srgb};
 
     #[test]
     fn basic() {
@@ -57,6 +69,7 @@ mod tests {
 
     #[test]
     fn conversion() {
-        // let srgb: WithAlpha<Rgb<Srgb>> = Rgb::rec2020(0.1, 0.2, 0.3).with_alpha(1.0).into();
+        let with_alpha = Rgb::rec2020(0.1, 0.2, 0.3).with_alpha(1.0);
+        let _srgb: WithAlpha<Rgb<Srgb>> = with_alpha.into_color();
     }
 }

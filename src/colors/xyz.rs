@@ -1,4 +1,4 @@
-use crate::Lab;
+use crate::{convert::FromColor, Lab};
 use euclid::default::{Transform3D, Vector3D};
 use std::marker::PhantomData;
 
@@ -56,10 +56,10 @@ macro_rules! declare_white_ref {
 declare_white_ref!(D50, d50);
 declare_white_ref!(D65, d65);
 
-impl From<Lab> for Xyz<D50> {
+impl FromColor<Lab> for Xyz<D50> {
     /// Convert Lab to D50-adapted XYZ
     /// <http://www.brucelindbloom.com/index.html?Eqn_RGB_XYZ_Matrix.html>
-    fn from(lab: Lab) -> Self {
+    fn from_color(lab: Lab) -> Self {
         const WHITE: [f32; 3] = [0.3457 / 0.3585, 1.00000, (1.0 - 0.3457 - 0.3585) / 0.3585];
 
         const KAPPA: f32 = 24389.0 / 27.0; // 29 ^ 3 / 3 ^ 3
@@ -93,8 +93,8 @@ impl From<Lab> for Xyz<D50> {
     }
 }
 
-impl From<Xyz<D50>> for Xyz<D65> {
-    fn from(xyz: Xyz<D50>) -> Self {
+impl FromColor<Xyz<D50>> for Xyz<D65> {
+    fn from_color(xyz: Xyz<D50>) -> Self {
         // Bradford chromatic adaptation from D50 to D65.
         #[allow(clippy::excessive_precision)]
         #[rustfmt::skip]

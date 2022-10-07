@@ -12,6 +12,7 @@
 
 mod alpha;
 mod colors;
+mod convert;
 
 pub use alpha::WithAlpha;
 pub use colors::*;
@@ -19,15 +20,16 @@ pub use colors::*;
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::convert::IntoColor;
 
     #[test]
     fn to_srgb() {
-        let _ = Rgb::<Srgb>::from(Rgb::srgb_linear(0.1, 0.2, 0.3));
-        let _ = Rgb::<Srgb>::from(Hsl::new(0.1, 0.2, 0.3));
-        let _ = Rgb::<Srgb>::from(Hwb::new(0.1, 0.2, 0.3));
-        let _ = Rgb::<Srgb>::from(Lab::new(20.0, 0.0, 10.0));
-        let _ = Rgb::<Srgb>::from(Lch::new(20.0, 0.0, 10.0));
-        let _ = Rgb::<Srgb>::from(Oklab::new(20.0, 0.0, 10.0));
-        let _ = Rgb::<Srgb>::from(Oklch::new(20.0, 0.0, 10.0));
+        let _: Rgb<Srgb> = Rgb::srgb_linear(0.1, 0.2, 0.3).into_color();
+        let _: Rgb<Srgb> = Hsl::new(0.1, 0.2, 0.3).into_color();
+        let _: Rgb<Srgb> = Hwb::new(0.1, 0.2, 0.3).into_color();
+        let _: Rgb<Srgb> = Lab::new(20.0, 0.0, 10.0).into_color();
+        let _: Rgb<Srgb> = Lch::new(20.0, 0.0, 10.0).into_color();
+        let _: Rgb<Srgb> = Oklab::new(20.0, 0.0, 10.0).into_color();
+        let _: Rgb<Srgb> = Oklch::new(20.0, 0.0, 10.0).into_color();
     }
 }

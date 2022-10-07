@@ -1,4 +1,5 @@
-use crate::{Hsl, Hwb, Lab, Lch, Oklab, Oklch, Xyz, D50, D65};
+use crate::convert::IntoColor;
+use crate::{convert::FromColor, Hsl, Hwb, Lab, Lch, Oklab, Oklch, Xyz, D50, D65};
 use euclid::default::{Transform3D, Vector3D};
 use std::marker::PhantomData;
 
@@ -20,9 +21,9 @@ macro_rules! declare_color_space {
 
 declare_color_space!(Srgb, srgb);
 
-impl From<Xyz<D65>> for Rgb<SrgbLinear> {
+impl FromColor<Xyz<D65>> for Rgb<SrgbLinear> {
     /// Convert XYZ with D65 white point to linear sRGB.
-    fn from(xyz: Xyz<D65>) -> Self {
+    fn from_color(xyz: Xyz<D65>) -> Self {
         #[rustfmt::skip]
         const MAT: Transform3D<f32> = Transform3D::new(
             12831.0 / 3959.0,    -329.0 / 214.0,        -1974.0 / 3959.0,    0.0,
@@ -39,8 +40,8 @@ impl From<Xyz<D65>> for Rgb<SrgbLinear> {
     }
 }
 
-impl From<Rgb<SrgbLinear>> for Rgb<Srgb> {
-    fn from(from: Rgb<SrgbLinear>) -> Self {
+impl FromColor<Rgb<SrgbLinear>> for Rgb<Srgb> {
+    fn from_color(from: Rgb<SrgbLinear>) -> Self {
         #[inline(always)]
         fn map(value: f32) -> f32 {
             let sign = if value < 0.0 { -1.0 } else { 1.0 };
@@ -57,8 +58,14 @@ impl From<Rgb<SrgbLinear>> for Rgb<Srgb> {
     }
 }
 
-impl From<Hsl> for Rgb<Srgb> {
-    fn from(from: Hsl) -> Self {
+impl FromColor<Rgb<Rec2020>> for Rgb<Srgb> {
+    fn from_color(_from: Rgb<Rec2020>) -> Self {
+        todo!()
+    }
+}
+
+impl FromColor<Hsl> for Rgb<Srgb> {
+    fn from_color(from: Hsl) -> Self {
         #[inline(always)]
         fn hue_to_rgb(m1: f32, m2: f32, mut h3: f32) -> f32 {
             if h3 < 0. {
@@ -92,13 +99,13 @@ impl From<Hsl> for Rgb<Srgb> {
     }
 }
 
-impl From<Hwb> for Rgb<Srgb> {
-    fn from(from: Hwb) -> Self {
+impl FromColor<Hwb> for Rgb<Srgb> {
+    fn from_color(from: Hwb) -> Self {
         if from.whiteness + from.blackness >= 1.0 {
             let gray = from.whiteness / (from.whiteness + from.blackness);
             Self::new(gray, gray, gray)
         } else {
-            let rgb: Rgb<Srgb> = Hsl::new(from.hue, 1.0, 0.5).into();
+            let rgb: Rgb<Srgb> = Hsl::new(from.hue, 1.0, 0.5).into_color();
             let x = 1.0 - from.whiteness - from.blackness;
             let red = rgb.red * x + from.whiteness;
             let green = rgb.green * x + from.whiteness;
@@ -108,37 +115,37 @@ impl From<Hwb> for Rgb<Srgb> {
     }
 }
 
-impl From<Lab> for Rgb<Srgb> {
-    fn from(from: Lab) -> Self {
-        let xyz_d50 = Xyz::<D50>::from(from);
-        let xyz_d65 = Xyz::<D65>::from(xyz_d50);
-        let linear = Rgb::<SrgbLinear>::from(xyz_d65);
-        Self::from(linear)
+impl FromColor<Lab> for Rgb<Srgb> {
+    fn from_color(from: Lab) -> Self {
+        let xyz_d50 = Xyz::<D50>::from_color(from);
+        let xyz_d65 = Xyz::<D65>::from_color(xyz_d50);
+        let linear = Rgb::<SrgbLinear>::from_color(xyz_d65);
+        Self::from_color(linear)
     }
 }
 
-impl From<Lch> for Rgb<Srgb> {
-    fn from(_: Lch) -> Self {
+impl FromColor<Lch> for Rgb<Srgb> {
+    fn from_color(_: Lch) -> Self {
         todo!()
     }
 }
 
-impl From<Oklab> for Rgb<Srgb> {
-    fn from(_: Oklab) -> Self {
+impl FromColor<Oklab> for Rgb<Srgb> {
+    fn from_color(_: Oklab) -> Self {
         todo!()
     }
 }
 
-impl From<Oklch> for Rgb<Srgb> {
-    fn from(_: Oklch) -> Self {
+impl FromColor<Oklch> for Rgb<Srgb> {
+    fn from_color(_: Oklch) -> Self {
         todo!()
     }
 }
 
 declare_color_space!(SrgbLinear, srgb_linear);
 
-impl From<Rgb<Srgb>> for Rgb<SrgbLinear> {
-    fn from(from: Rgb<Srgb>) -> Self {
+impl FromColor<Rgb<Srgb>> for Rgb<SrgbLinear> {
+    fn from_color(from: Rgb<Srgb>) -> Self {
         #[inline(always)]
         fn map(value: f32) -> f32 {
             let sign = if value < 0.0 { -1.0 } else { 1.0 };
