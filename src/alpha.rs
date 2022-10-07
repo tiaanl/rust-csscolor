@@ -25,12 +25,6 @@ impl<C> DerefMut for WithAlpha<C> {
     }
 }
 
-// impl<C, F> From<WithAlpha<F>> for WithAlpha<C> {
-//     fn from(from: WithAlpha<F>) -> Self {
-//         WithAlpha::new(Self::from(from.components), from.alpha)
-//     }
-// }
-
 pub trait WithAlphaExt<C> {
     fn with_alpha(self, alpha: f32) -> WithAlpha<C>;
 }

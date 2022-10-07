@@ -4,7 +4,7 @@ This crate represents color functionality related to the [CSS color specificatio
 
 ## Features
 
-- [ ] Structures to represent colors in various formats
+- [ ] Structures to represent colors in various formats:
   - RGB
   - HSL
   - HWB
@@ -20,4 +20,4 @@ This crate represents color functionality related to the [CSS color specificatio
   - prophoto_rgb
   - rec2020
 - [ ] Convert all color formats to sRGB (for rendering)
-
+- [ ] Lerp between various color formats/spaces.

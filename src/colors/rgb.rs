@@ -1,4 +1,4 @@
-use crate::{Hsl, Hwb, Lab, Lch, Oklab, Oklch, D50, D65, XYZ};
+use crate::{Hsl, Hwb, Lab, Lch, Oklab, Oklch, Xyz, D50, D65};
 use euclid::default::{Transform3D, Vector3D};
 use std::marker::PhantomData;
 
@@ -20,9 +20,9 @@ macro_rules! declare_color_space {
 
 declare_color_space!(Srgb, srgb);
 
-impl From<XYZ<D65>> for Rgb<SrgbLinear> {
+impl From<Xyz<D65>> for Rgb<SrgbLinear> {
     /// Convert XYZ with D65 white point to linear sRGB.
-    fn from(xyz: XYZ<D65>) -> Self {
+    fn from(xyz: Xyz<D65>) -> Self {
         #[rustfmt::skip]
         const MAT: Transform3D<f32> = Transform3D::new(
             12831.0 / 3959.0,    -329.0 / 214.0,        -1974.0 / 3959.0,    0.0,
@@ -110,8 +110,8 @@ impl From<Hwb> for Rgb<Srgb> {
 
 impl From<Lab> for Rgb<Srgb> {
     fn from(from: Lab) -> Self {
-        let xyz_d50 = XYZ::<D50>::from(from);
-        let xyz_d65 = XYZ::<D65>::from(xyz_d50);
+        let xyz_d50 = Xyz::<D50>::from(from);
+        let xyz_d65 = Xyz::<D65>::from(xyz_d50);
         let linear = Rgb::<SrgbLinear>::from(xyz_d65);
         Self::from(linear)
     }

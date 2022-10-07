@@ -4,7 +4,23 @@ use std::marker::PhantomData;
 
 pub trait WhiteRef {}
 
-pub struct XYZ<W: WhiteRef> {
+/// XYZ color format.
+///
+/// ```rust
+/// use rust_csscolor::{D65, Xyz};
+///
+/// // Create a color with a D50 white reference.
+/// let d50 = Xyz::d50(0.1, 0.2, 0.3);
+///
+/// // Create a color with a D65 white reference.
+/// let d65 = Xyz::d65(0.1, 0.2, 0.3);
+///
+/// // Convert between them.
+/// let converted: Xyz<D65> = d65.into();
+/// // or
+/// let converted = Xyz::<D65>::from(d50);
+/// ```
+pub struct Xyz<W: WhiteRef> {
     pub x: f32,
     pub y: f32,
     pub z: f32,
@@ -12,7 +28,7 @@ pub struct XYZ<W: WhiteRef> {
     phantom: PhantomData<W>,
 }
 
-impl<W: WhiteRef> XYZ<W> {
+impl<W: WhiteRef> Xyz<W> {
     fn new(x: f32, y: f32, z: f32) -> Self {
         Self {
             x,
@@ -27,9 +43,9 @@ macro_rules! declare_white_ref {
     ($name:ident, $new_name:ident) => {
         pub struct $name;
 
-        impl XYZ<$name> {
-            pub fn $new_name(x: f32, y: f32, z: f32) -> XYZ<$name> {
-                XYZ::<$name>::new(x, y, z)
+        impl Xyz<$name> {
+            pub fn $new_name(x: f32, y: f32, z: f32) -> Xyz<$name> {
+                Xyz::<$name>::new(x, y, z)
             }
         }
 
@@ -40,9 +56,9 @@ macro_rules! declare_white_ref {
 declare_white_ref!(D50, d50);
 declare_white_ref!(D65, d65);
 
-impl From<Lab> for XYZ<D50> {
+impl From<Lab> for Xyz<D50> {
     /// Convert Lab to D50-adapted XYZ
-    /// http://www.brucelindbloom.com/index.html?Eqn_RGB_XYZ_Matrix.html
+    /// <http://www.brucelindbloom.com/index.html?Eqn_RGB_XYZ_Matrix.html>
     fn from(lab: Lab) -> Self {
         const WHITE: [f32; 3] = [0.3457 / 0.3585, 1.00000, (1.0 - 0.3457 - 0.3585) / 0.3585];
 
@@ -73,12 +89,12 @@ impl From<Lab> for XYZ<D50> {
         };
 
         // Compute XYZ by scaling xyz by reference white.
-        XYZ::d50(x * WHITE[0], y * WHITE[1], z * WHITE[2])
+        Xyz::d50(x * WHITE[0], y * WHITE[1], z * WHITE[2])
     }
 }
 
-impl From<XYZ<D50>> for XYZ<D65> {
-    fn from(xyz: XYZ<D50>) -> Self {
+impl From<Xyz<D50>> for Xyz<D65> {
+    fn from(xyz: Xyz<D50>) -> Self {
         // Bradford chromatic adaptation from D50 to D65.
         #[allow(clippy::excessive_precision)]
         #[rustfmt::skip]

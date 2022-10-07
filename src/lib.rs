@@ -1,24 +1,20 @@
 //! Color operations related to the [CSS Color specification ](https://drafts.csswg.org/css-color)
+//!
+//! The following color formats are supported:
+//! - [RGB](Rgb) (red, green, blue) (with color spaces: srgb, srgb_linear, display_p3, a98, prophoto, rec2020)
+//! - [XYZ](Xyz) (with white references: D50, D65)
+//! - [HSL](Hsl) (hue, saturation, lightness)
+//! - [HWB](Hwb) (hue, whiteness, blackness)
+//! - [LAB](Lab) (lightness, a, b)
+//! - [LCH](Lch) (lightness, chroma, hue)
+//! - [OKLAB](Oklab) (lightness, a, b)
+//! - [OKLCH](Oklch) (lightness, chroma, hue)
 
 mod alpha;
-mod hsl;
-mod hwb;
-mod lab;
-mod lch;
-mod oklab;
-mod oklch;
-mod rgb;
-mod xyz;
+mod colors;
 
 pub use alpha::WithAlpha;
-pub use hsl::Hsl;
-pub use hwb::Hwb;
-pub use lab::Lab;
-pub use lch::Lch;
-pub use oklab::Oklab;
-pub use oklch::Oklch;
-pub use rgb::{DisplayP3, Prophoto, Rec2020, Rgb, Srgb, SrgbLinear, A98};
-pub use xyz::{D50, D65, XYZ};
+pub use colors::*;
 
 #[cfg(test)]
 mod tests {
