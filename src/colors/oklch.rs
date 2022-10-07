@@ -1,3 +1,4 @@
+/// Lightness, chrome, hue color format. (Oklch)
 pub struct Oklch {
     pub lightness: f32,
     pub chroma: f32,

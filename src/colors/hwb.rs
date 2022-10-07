@@ -1,3 +1,4 @@
+/// Hue, whiteness, blackness color format.
 pub struct Hwb {
     pub hue: f32,
     pub whiteness: f32,

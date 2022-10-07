@@ -1,3 +1,4 @@
+/// Hue, saturation, lightness color format.
 pub struct Hsl {
     pub hue: f32,
     pub saturation: f32,

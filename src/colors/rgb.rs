@@ -7,6 +7,7 @@ pub trait ColorSpace {}
 
 macro_rules! declare_color_space {
     ($name:ident, $new_name:ident) => {
+        /// Color space.
         pub struct $name;
 
         impl Rgb<$name> {
@@ -59,8 +60,23 @@ impl FromColor<Rgb<SrgbLinear>> for Rgb<Srgb> {
 }
 
 impl FromColor<Rgb<Rec2020>> for Rgb<Srgb> {
-    fn from_color(_from: Rgb<Rec2020>) -> Self {
-        todo!()
+    /// ITU-R BT.2020-2 p.4
+    fn from_color(from: Rgb<Rec2020>) -> Self {
+        const ALPHA: f32 = 1.09929682680944;
+        const BETA: f32 = 0.018053968510807;
+
+        fn map(value: f32) -> f32 {
+            let sign = if value < 0.0 { -1.0 } else { 1.0 };
+            let abs = value.abs();
+
+            if abs > BETA {
+                sign * (ALPHA * abs.powf(0.45) - (ALPHA - 1.0))
+            } else {
+                4.5 * value
+            }
+        }
+
+        Self::new(map(from.red), map(from.green), map(from.blue))
     }
 }
 
@@ -125,20 +141,24 @@ impl FromColor<Lab> for Rgb<Srgb> {
 }
 
 impl FromColor<Lch> for Rgb<Srgb> {
-    fn from_color(_: Lch) -> Self {
-        todo!()
+    fn from_color(from: Lch) -> Self {
+        let lab = Lab::from_color(from);
+        lab.into_color()
     }
 }
 
 impl FromColor<Oklab> for Rgb<Srgb> {
-    fn from_color(_: Oklab) -> Self {
-        todo!()
+    fn from_color(from: Oklab) -> Self {
+        let xyz: Xyz<D65> = from.into_color();
+        let linear: Rgb<SrgbLinear> = xyz.into_color();
+        linear.into_color()
     }
 }
 
 impl FromColor<Oklch> for Rgb<Srgb> {
-    fn from_color(_: Oklch) -> Self {
-        todo!()
+    fn from_color(from: Oklch) -> Self {
+        let oklab: Oklab = from.into_color();
+        oklab.into_color()
     }
 }
 
@@ -167,6 +187,15 @@ declare_color_space!(A98, a98);
 declare_color_space!(Prophoto, prophoto);
 declare_color_space!(Rec2020, rec2020);
 
+/// Red, green, blue color format. Specialized on a color space.
+///
+/// Examples:
+/// ```rust
+/// use rust_csscolor::{DisplayP3, Rgb, Srgb};
+///
+/// let srgb = Rgb::<Srgb>::new(0.1, 0.2, 0.3);
+/// let display_p3 = Rgb::<DisplayP3>::new(0.1, 0.2, 0.3);
+/// ```
 pub struct Rgb<C: ColorSpace> {
     pub red: f32,
     pub green: f32,

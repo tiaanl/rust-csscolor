@@ -12,7 +12,7 @@ pub trait FromColor<T>: Sized {
 /// Do not implement this trait for any color format/space.  It is there for convenience, e.g.
 ///
 /// ```rust
-/// use rust_csscolor::{Rgb, Srgb};
+/// use rust_csscolor::{IntoColor, Rgb, Srgb};
 /// let srgb: Rgb<Srgb> = Rgb::rec2020(0.1, 0.2, 0.3).into_color();
 /// ```
 pub trait IntoColor<T>: Sized {

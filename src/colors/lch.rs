@@ -1,3 +1,4 @@
+/// Lightness, chroma, hue color format.
 pub struct Lch {
     pub lightness: f32,
     pub chroma: f32,

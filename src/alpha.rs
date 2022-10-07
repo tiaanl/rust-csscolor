@@ -1,6 +1,17 @@
 use crate::convert::FromColor;
 use std::ops::{Deref, DerefMut};
 
+/// Container used to add an alpha component to any color format.
+///
+/// ```rust
+/// use rust_csscolor::{Rgb, WithAlphaExt};
+///
+/// let srgb_with_alpha = Rgb::srgb(0.1, 0.2, 0.3).with_alpha(0.4);
+/// assert_eq!(srgb_with_alpha.red, 0.1);
+/// assert_eq!(srgb_with_alpha.green, 0.2);
+/// assert_eq!(srgb_with_alpha.blue, 0.3);
+/// assert_eq!(srgb_with_alpha.alpha, 0.4);
+/// ```
 pub struct WithAlpha<C> {
     pub components: C,
     pub alpha: f32,

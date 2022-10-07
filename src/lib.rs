@@ -10,12 +10,16 @@
 //! - [OKLAB](Oklab) (lightness, a, b)
 //! - [OKLCH](Oklch) (lightness, chroma, hue)
 
+// Excessive precision is used in conversion matrices.
+#![allow(clippy::excessive_precision)]
+
 mod alpha;
 mod colors;
 mod convert;
 
-pub use alpha::WithAlpha;
+pub use alpha::*;
 pub use colors::*;
+pub use convert::*;
 
 #[cfg(test)]
 mod tests {

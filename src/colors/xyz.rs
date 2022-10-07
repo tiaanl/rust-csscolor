@@ -1,13 +1,13 @@
-use crate::{convert::FromColor, Lab};
+use crate::{convert::FromColor, Lab, Oklab};
 use euclid::default::{Transform3D, Vector3D};
 use std::marker::PhantomData;
 
 pub trait WhiteRef {}
 
-/// XYZ color format.
+/// X, y, z color format.
 ///
 /// ```rust
-/// use rust_csscolor::{D65, Xyz};
+/// use rust_csscolor::{D65, FromColor, Xyz};
 ///
 /// // Create a color with a D50 white reference.
 /// let d50 = Xyz::d50(0.1, 0.2, 0.3);
@@ -18,7 +18,7 @@ pub trait WhiteRef {}
 /// // Convert between them.
 /// let converted: Xyz<D65> = d65.into();
 /// // or
-/// let converted = Xyz::<D65>::from(d50);
+/// let converted = Xyz::<D65>::from_color(d50);
 /// ```
 pub struct Xyz<W: WhiteRef> {
     pub x: f32,
@@ -41,6 +41,7 @@ impl<W: WhiteRef> Xyz<W> {
 
 macro_rules! declare_white_ref {
     ($name:ident, $new_name:ident) => {
+        /// White reference.
         pub struct $name;
 
         impl Xyz<$name> {
@@ -55,6 +56,26 @@ macro_rules! declare_white_ref {
 
 declare_white_ref!(D50, d50);
 declare_white_ref!(D65, d65);
+
+impl FromColor<Xyz<D50>> for Xyz<D65> {
+    fn from_color(xyz: Xyz<D50>) -> Self {
+        // Bradford chromatic adaptation from D50 to D65.
+        #[allow(clippy::excessive_precision)]
+        #[rustfmt::skip]
+        const MAT: Transform3D<f32> = Transform3D::new(
+            0.9554734527042182,   -0.023098536874261423,  0.0632593086610217,   0.0,
+            -0.028369706963208136,  1.0099954580058226,    0.021041398966943008, 0.0,
+            0.012314001688319899, -0.020507696433477912,  1.3303659366080753,   0.0,
+            0.0,                   0.0,                   0.0,                  1.0,
+        );
+
+        let (x, y, z) = MAT
+            .transform_vector3d(Vector3D::new(xyz.x, xyz.y, xyz.z))
+            .into();
+
+        Self::new(x, y, z)
+    }
+}
 
 impl FromColor<Lab> for Xyz<D50> {
     /// Convert Lab to D50-adapted XYZ
@@ -93,21 +114,26 @@ impl FromColor<Lab> for Xyz<D50> {
     }
 }
 
-impl FromColor<Xyz<D50>> for Xyz<D65> {
-    fn from_color(xyz: Xyz<D50>) -> Self {
-        // Bradford chromatic adaptation from D50 to D65.
-        #[allow(clippy::excessive_precision)]
+impl FromColor<Oklab> for Xyz<D65> {
+    fn from_color(from: Oklab) -> Self {
         #[rustfmt::skip]
-        const MAT: Transform3D<f32> = Transform3D::new(
-             0.9554734527042182,   -0.023098536874261423,  0.0632593086610217,   0.0,
-            -0.028369706963208136,  1.0099954580058226,    0.021041398966943008, 0.0,
-             0.012314001688319899, -0.020507696433477912,  1.3303659366080753,   0.0,
-             0.0,                   0.0,                   0.0,                  1.0,
+        const LMS_TO_XYZ: Transform3D<f32> = Transform3D::new(
+             1.2268798733741557,  -0.5578149965554813,  0.28139105017721583, 0.0,
+            -0.04057576262431372,  1.1122868293970594, -0.07171106666151701, 0.0,
+            -0.07637294974672142, -0.4214933239627914,  1.5869240244272418,  0.0,
+             0.0,                  0.0,                 0.0,                 1.0,
         );
 
-        let (x, y, z) = MAT
-            .transform_vector3d(Vector3D::new(xyz.x, xyz.y, xyz.z))
-            .into();
+        #[rustfmt::skip]
+        const OKLAB_TO_LMS: Transform3D<f32> = Transform3D::new(
+            0.99999999845051981432,  0.39633779217376785678,   0.21580375806075880339,  0.0,
+            1.0000000088817607767,  -0.1055613423236563494,   -0.063854174771705903402, 0.0,
+            1.0000000546724109177,  -0.089484182094965759684, -1.2914855378640917399,   0.0,
+            0.0,                     0.0,                      0.0,                     1.0,
+        );
+
+        let lms = OKLAB_TO_LMS.transform_vector3d(Vector3D::new(from.lightness, from.a, from.b));
+        let (x, y, z) = LMS_TO_XYZ.transform_vector3d(lms).into();
 
         Self::new(x, y, z)
     }
