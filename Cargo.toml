@@ -1,5 +1,5 @@
 [package]
-name = "rust-csscolor"
+name = "csscolor"
 version = "0.1.0"
 edition = "2021"
 

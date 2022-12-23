@@ -1,23 +1,3 @@
 # CSS Color
 
-This crate represents color functionality related to the [CSS color specification](https://drafts.csswg.org/css-color)
-
-## Features
-
-- [ ] Structures to represent colors in various formats:
-  - RGB
-  - HSL
-  - HWB
-  - LAB
-  - LCH
-  - OKLAB
-  - OKLCH
-- [ ] RGB supports different color spaces:
-  - srgb
-  - srgb_linear
-  - display_p3
-  - a98_rgb
-  - prophoto_rgb
-  - rec2020
-- [ ] Convert all color formats to sRGB (for rendering)
-- [ ] Lerp between various color formats/spaces.
+This crate represents color functionality related to the [CSS color specification](https://w3c.github.io/csswg-drafts/css-color)
