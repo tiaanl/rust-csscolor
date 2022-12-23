@@ -1,3 +1,5 @@
+#![allow(clippy::excessive_precision)]
+
 use crate::ColorSpace;
 
 use super::ColorComponents;
@@ -526,7 +528,7 @@ impl ColorSpaceConversion for Lch {
 
     fn from_xyz(from: &ColorComponents) -> ColorComponents {
         // First convert the XYZ to LAB.
-        let ColorComponents(lightness, a, b) = Lab::from_xyz(&from);
+        let ColorComponents(lightness, a, b) = Lab::from_xyz(from);
 
         // Then conver the Lab to LCH.
         let hue = b.atan2(a) * DEG_PER_RAD;
@@ -586,13 +588,13 @@ impl ColorSpaceConversion for Oklab {
     }
 
     fn to_xyz(from: &ColorComponents) -> ColorComponents {
-        let lms = transform(&from, &Self::OKLAB_TO_LMS);
+        let lms = transform(from, &Self::OKLAB_TO_LMS);
         let lms = lms.copy_and_apply(|v| v.powf(3.0));
         transform(&lms, &Self::LMS_TO_XYZ)
     }
 
     fn from_xyz(from: &ColorComponents) -> ColorComponents {
-        let lms = transform(&from, &Self::XYZ_TO_LMS);
+        let lms = transform(from, &Self::XYZ_TO_LMS);
         let lms = lms.copy_and_apply(|v| v.cbrt());
         transform(&lms, &Self::LMS_TO_OKLAB)
     }
@@ -626,7 +628,7 @@ impl ColorSpaceConversion for Oklch {
 
     fn from_xyz(from: &ColorComponents) -> ColorComponents {
         // First convert XYZ to Oklab.
-        let ColorComponents(lightness, a, b) = Oklab::from_xyz(&from);
+        let ColorComponents(lightness, a, b) = Oklab::from_xyz(from);
 
         // Then convert Oklab to OkLCH.
         let hue = b.atan2(a) * DEG_PER_RAD;
