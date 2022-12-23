@@ -1,4 +1,6 @@
 /// The color space that color components can be specified in.
+#[derive(Clone, Copy, Eq, PartialEq)]
+#[repr(u8)]
 pub enum ColorSpace {
     /// CIE L*a*b* color space.
     /// https://w3c.github.io/csswg-drafts/css-color-4/#lab-colors

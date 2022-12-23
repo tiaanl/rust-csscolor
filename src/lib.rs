@@ -2,6 +2,7 @@
 
 mod color;
 mod color_space;
+mod convert;
 
 pub use color::{Color, ColorComponents};
 pub use color_space::ColorSpace;
